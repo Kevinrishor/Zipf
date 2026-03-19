@@ -1,3 +1,7 @@
+import pandas as pd
+import numpy as np
+from scipy import stats
+
      Orden	Frec.absoluta 	 Frec.normalizada 
      1.	de	9,999,518 	 65545.55 
      2.	la	6,277,560 	 41148.59 
