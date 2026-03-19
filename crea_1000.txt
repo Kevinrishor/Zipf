@@ -1,0 +1,35 @@
+import pandas as pd
+import numpy as np
+from scipy import stats
+
+# 1. Cargar el archivo. 
+# El archivo de la RAE suele usar codificación 'latin-1' o 'iso-8859-1'.
+# sep='\s+' detecta cualquier cantidad de espacios en blanco como separador.
+# skiprows=7 salta el encabezado informativo del CREA.
+try:
+    df = pd.read_csv('crea_1000.txt', sep='\s+', encoding='latin-1', 
+                     skiprows=7, names=['pos', 'palabra', 'frec_abs', 'frec_norm'])
+except:
+    print("Asegúrate de que el nombre del archivo coincida.")
+
+# 2. Limpiar datos. 
+# A veces las frecuencias vienen con puntos o comas. Nos aseguramos de que sean números.
+df['frec_abs'] = pd.to_numeric(df['frec_abs'], errors='coerce')
+df = df.dropna(subset=['frec_abs'])
+
+# 3. Transformación logarítmica (base 10 es más común para Zipf)
+# n es la posición (rango) y fn es la frecuencia absoluta
+df['log_n'] = np.log10(df['pos'])
+df['log_fn'] = np.log10(df['frec_abs'])
+
+# 4. Regresión Lineal
+# y = intercepto + pendiente * x
+slope, intercept, r_value, p_value, std_err = stats.linregress(df['log_n'], df['log_fn'])
+
+# 5. Resultados para el informe
+a_estimado = -slope
+incertidumbre = std_err
+
+print(f"Valor de a: {a_estimado:.4f}")
+print(f"Incertidumbre estándar (u_a): {incertidumbre:.4f}")
+print(f"Coeficiente de determinación (R^2): {r_value**2:.4f}")
